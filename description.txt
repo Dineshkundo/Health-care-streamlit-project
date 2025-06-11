@@ -1,1 +1,68 @@
-This app will pull the data from APIs in json form and then build the CICD Pipeline automatically
+#This app will pull the data from APIs in json form and then build the CICD Pipeline automatically
+# Go to https://killercoda.com/playgrounds/
+# Select kubernetes playground and create deployment and service files.
+# Apply and expose it.
+controlplane:~$ cat deployment.yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heath-app-deploy
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: dineshkundo/health-app-streamlit:tagname
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8501
+controlplane:~$ cat service.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  name: health-app-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - port: 8501
+      targetPort: 8501
+      nodePort: 30085  # Optional fixed port in the range 30000–32767
+  type: NodePort
+
+controlplane:~$ kubectl apply -f service.yaml deployment.yaml
+
+✅ Access Your Streamlit App
+👉 In KillerKoda, do the following:
+At the top of the terminal, click the “+” icon.
+
+Select “Select port to open”.
+
+Enter:
+30085
+KillerKoda will open a new browser tab or URL like:
+
+
+https://<your-session>.k8s.killerkoda.io:30085
+You should now see your Streamlit GCP FinOps Dashboard 🎉
+
+🧼 Final Checklist
+✅ Your pod(s) should be READY 1/1:
+
+
+kubectl get pods
+✅ Your deployment and service:
+
+kubectl get deploy
+kubectl get svc
+
